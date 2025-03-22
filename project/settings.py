@@ -80,21 +80,20 @@ WSGI_APPLICATION = 'project.wsgi.application'
 # postgresql://asala_postgres_user:wv209HQOYUTr7MDKClmIcq9N68xrO3sc@dpg-cvfi5t5umphs73daajh0-a.oregon-postgres.render.com/asala_postgres
 DATABASES = {
     'default': dj_database_url.config(
-        # Replace this value with your local database's connection string.
         default='postgresql://asala_postgres_user:wv209HQOYUTr7MDKClmIcq9N68xrO3sc@dpg-cvfi5t5umphs73daajh0-a.oregon-postgres.render.com/asala_postgres',
         conn_max_age=600
     )
 }
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'asala_postgres',
-        'USER': 'asala_postgres_user',
-        'PASSWORD': 'wv209HQOYUTr7MDKClmIcq9N68xrO3sc',
-        'HOST': 'postgresql://asala_postgres_user:wv209HQOYUTr7MDKClmIcq9N68xrO3sc@dpg-cvfi5t5umphs73daajh0-a.oregon-postgres.render.com/asala_postgres',
-        'PORT': '5432',
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'asala_postgres',
+#         'USER': 'asala_postgres_user',
+#         'PASSWORD': 'wv209HQOYUTr7MDKClmIcq9N68xrO3sc',
+#         'HOST': 'postgresql://asala_postgres_user:wv209HQOYUTr7MDKClmIcq9N68xrO3sc@dpg-cvfi5t5umphs73daajh0-a.oregon-postgres.render.com/asala_postgres',
+#         'PORT': '5432',
+#     }
+# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {

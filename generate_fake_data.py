@@ -7,10 +7,13 @@ from faker.providers import BaseProvider
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")  # Replace "project.settings" with your settings module
 django.setup()
 
-# Custom provider for Arabic text and unique category names
+# Custom provider for Arabic data using ar_SA locale with RTL marker prefix
 class ArabicProvider(BaseProvider):
+    # Arabic names typical for the region
     ARABIC_NAMES = ['محمد', 'أحمد', 'علي', 'عمر', 'حسن', 'عبدالله', 'عبدالرحمن', 'فيصل', 'سعيد', 'خالد']
+    # Arabic companies or artistic identifiers
     ARABIC_COMPANIES = ['الفارس', 'الهُدى', 'المدينة', 'النور', 'السفوة', 'الجزيرة', 'الأمل', 'القاسم', 'الرشيد', 'المجيد']
+    # Arabic sentences for descriptions
     ARABIC_SENTENCES = [
         'مكرس للفن والثقافة.',
         'انضم إلينا لاستكشاف الإبداع.',
@@ -21,26 +24,27 @@ class ArabicProvider(BaseProvider):
         'إلهام الفن بلمسة تقليدية.',
         'احتفال بروح الفن والثقافة.'
     ]
-    # Fixed, unique Arabic category names (related to art)
+    # Fixed, unique Arabic category names (related to art specialties)
     ARABIC_CATEGORY_NAMES = ["الخياطة", "النحت", "الرسم", "الخط", "التصوير", "التطريز", "الفخار", "الموسيقى", "الأدب", "العمارة"]
 
     def arabic_name(self):
-        return random.choice(self.ARABIC_NAMES)
+        # Prefix with RTL marker to maintain proper order
+        return "\u200F" + random.choice(self.ARABIC_NAMES)
     
     def arabic_company(self):
-        return random.choice(self.ARABIC_COMPANIES)
+        return "\u200F" + random.choice(self.ARABIC_COMPANIES)
     
     def arabic_sentence(self):
-        return random.choice(self.ARABIC_SENTENCES)
+        return "\u200F" + random.choice(self.ARABIC_SENTENCES)
     
     def arabic_category(self):
-        return random.choice(self.ARABIC_CATEGORY_NAMES)
+        return "\u200F" + random.choice(self.ARABIC_CATEGORY_NAMES)
 
-# Use an Arabic locale for more authentic output
-fake = Faker('ar_AE')
+# Initialize Faker with Arabic (Saudi Arabia) locale
+fake = Faker('ar_SA')
 fake.add_provider(ArabicProvider)
 
-# Import models (ensure these imports match your project structure)
+# Import models (ensure your project structure is correct)
 from accounts.models import CustomUser
 from communities.models import Community
 from clubs.models import Club
@@ -50,12 +54,14 @@ from products.models import Product
 # Create 20 fake users
 users = []
 for _ in range(20):
+    # Using Faker's unique method ensures different names
     username = fake.unique.first_name() + str(random.randint(1, 1000))
     user = CustomUser.objects.create_user(
         username=username,
         email=fake.email(),
         password="test12345",
-        full_name=fake.name()
+        full_name=fake.name(),
+        specialization=fake.word()  # Using a random word as specialization
     )
     users.append(user)
 
@@ -85,7 +91,7 @@ for _ in range(10):
         club.members.add(user)
     clubs.append(club)
 
-# Create 10 fake categories using the fixed list of unique Arabic category names
+# Create 10 fake categories using the fixed unique list
 categories = []
 for name in ArabicProvider.ARABIC_CATEGORY_NAMES:
     category = Category.objects.create(
@@ -94,7 +100,7 @@ for name in ArabicProvider.ARABIC_CATEGORY_NAMES:
     )
     categories.append(category)
 
-# Create 20 fake products assigned to random categories and random likes
+# Create 20 fake products assigned to random categories and with random likes
 products = []
 for _ in range(20):
     category = random.choice(categories)
