@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CategoryListView, CategoryOnlyListView, CategoryProductsView
+from .api import CategoryListView, CategoryOnlyListView, CategoryProductsView
 
 urlpatterns = [
     path('', CategoryOnlyListView.as_view(), name='category-list'),  # ✅ Returns categories without products

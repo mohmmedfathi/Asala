@@ -3,7 +3,7 @@ from .models import Category
 from products.serializers import ProductSerializer
 
 class CategorySerializer(serializers.ModelSerializer):
-    products = ProductSerializer(many=True, read_only=True)  # ✅ Nested products
+    products = ProductSerializer(many=True, read_only=True)  
 
     class Meta:
         model = Category
