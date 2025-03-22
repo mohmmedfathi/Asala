@@ -8,7 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = 'django-insecure-g^+e0kq6x-sy@=hwwe9vu4^at&puk^_1%q#43o=v*1er6-9qv)'
 
-DEBUG = False
+DEBUG = True
 
 if not DEBUG:
     STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') 
