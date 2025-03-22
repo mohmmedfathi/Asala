@@ -18,9 +18,13 @@ class RegisterView(APIView):
                 username=serializer.validated_data['username'],
                 email=serializer.validated_data['email'],
                 password=request.data.get('password'),
-                full_name=serializer.validated_data.get('full_name', '')
+                full_name=serializer.validated_data.get('full_name', ''),
+                specialization=serializer.validated_data.get('specialization', '')  # ✅ Added specialization
             )
-            return Response({'message': 'User registered successfully', 'user': UserSerializer(user).data})
+            return Response({
+                'message': 'User registered successfully',
+                'user': UserSerializer(user).data
+            }, status=201)
         return Response(serializer.errors, status=400)
 
 class LoginView(APIView):
