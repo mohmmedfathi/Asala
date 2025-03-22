@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     'accounts',
     'communities',
     'clubs',
+    'category',
     'products',
     'search',
     'recommendations',

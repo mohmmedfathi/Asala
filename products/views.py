@@ -1,15 +1,11 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Product, Category
-from .serializers import ProductSerializer, CategorySerializer
+from .models import Product
+from .serializers import ProductSerializer
 from rest_framework.permissions import IsAuthenticated
 
-class CategoryListView(APIView):
-    def get(self, request):
-        categories = Category.objects.all()
-        return Response(CategorySerializer(categories, many=True).data) 
-    
+
 class ProductListView(generics.ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
