@@ -1,9 +1,9 @@
 from django.db import models
 from django.conf import settings
 from category.models import Category
-
+from model_utils.models import TimeStampedModel
     
-class Product(models.Model):
+class Product(TimeStampedModel):
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)

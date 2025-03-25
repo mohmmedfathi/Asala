@@ -1,7 +1,10 @@
-from rest_framework import serializers
+from drf_writable_nested.serializers import WritableNestedModelSerializer
+from accounts.serializers.user import UserSerializer
 from .models import Community
 
-class CommunitySerializer(serializers.ModelSerializer):
+class CommunitySerializer(WritableNestedModelSerializer):
+    members = UserSerializer(many=True) 
+
     class Meta:
         model = Community
-        fields = '__all__'
+        fields = ['id', 'name', 'description', 'image', 'members']

@@ -1,7 +1,6 @@
 import os
 from pathlib import Path
 from datetime import timedelta
-import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -73,29 +72,17 @@ TEMPLATES = [
 WSGI_APPLICATION = 'project.wsgi.application'
 
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-# postgresql://asala_postgres_user:wv209HQOYUTr7MDKClmIcq9N68xrO3sc@dpg-cvfi5t5umphs73daajh0-a.oregon-postgres.render.com/asala_postgres
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default='postgresql://asala_postgres_user:wv209HQOYUTr7MDKClmIcq9N68xrO3sc@dpg-cvfi5t5umphs73daajh0-a.oregon-postgres.render.com/asala_postgres',
-        conn_max_age=600
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'asala_postgres'),
+        'USER': os.environ.get('DB_USER', 'asala_postgres_user'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'wv209HQOYUTr7MDKClmIcq9N68xrO3sc'),
+        'HOST': os.environ.get('DB_HOST', 'dpg-cvfi5t5umphs73daajh0-a.oregon-postgres.render.com'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
+    }
 }
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'asala_postgres',
-#         'USER': 'asala_postgres_user',
-#         'PASSWORD': 'wv209HQOYUTr7MDKClmIcq9N68xrO3sc',
-#         'HOST': 'postgresql://asala_postgres_user:wv209HQOYUTr7MDKClmIcq9N68xrO3sc@dpg-cvfi5t5umphs73daajh0-a.oregon-postgres.render.com/asala_postgres',
-#         'PORT': '5432',
-#     }
-# }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -143,6 +130,7 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True  
 
 SIMPLE_JWT = {
+    
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=900),  
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  
     'ROTATE_REFRESH_TOKENS': False,

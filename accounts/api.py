@@ -1,47 +1,36 @@
-from django.contrib.auth import authenticate
+from rest_framework import viewsets
+from rest_framework.permissions import  IsAuthenticated,AllowAny
+from rest_framework_simplejwt.views import TokenObtainPairView
+from accounts.serializers.user import UserSerializer, CustomTokenObtainPairSerializer,RegisterSerializer
+from accounts.permissions import IsAdminOrOwner
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny,IsAuthenticated
-from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.generics import RetrieveAPIView
+from accounts.models import CustomUser
 
-from .models import CustomUser
-from .serializers import UserSerializer
+
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    - **Admins:** Can list, update, and delete any user.
+    - **Users:** Can only retrieve and update their own profile.
+    """
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, IsAdminOrOwner]
+
+    def get_queryset(self):
+        return CustomUser.objects.all() if self.request.user.is_staff else CustomUser.objects.filter(id=self.request.user.id)
 
 class RegisterView(APIView):
+    """
+    Public endpoint for user registration.
+    """
     permission_classes = [AllowAny]
 
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
-            user = CustomUser.objects.create_user(
-                username=serializer.validated_data['username'],
-                email=serializer.validated_data['email'],
-                password=request.data.get('password'),
-                full_name=serializer.validated_data.get('full_name', ''),
-                specialization=serializer.validated_data.get('specialization', '')  # ✅ Added specialization
-            )
-            return Response({
-                'message': 'User registered successfully',
-                'user': UserSerializer(user).data
-            }, status=201)
+            user = serializer.save()
+            return Response({'message': 'User registered successfully', 'user': UserSerializer(user).data}, status=201)
         return Response(serializer.errors, status=400)
 
-class LoginView(APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        username = request.data.get('username')
-        password = request.data.get('password')
-        user = authenticate(username=username, password=password)
-        if user:
-            token = RefreshToken.for_user(user)
-            return Response({'access': str(token.access_token), 'refresh': str(token)})
-        return Response({'error': 'Invalid credentials'}, status=401)
-
-class UserProfileView(RetrieveAPIView):
-    permission_classes = [IsAuthenticated]
-    serializer_class = UserSerializer
-
-    def get_object(self):
-        return self.request.user
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer

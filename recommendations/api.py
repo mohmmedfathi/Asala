@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from accounts.models import CustomUser
 from clubs.models import Club
 from products.models import Product
-from accounts.serializers import UserSerializer
+from accounts.serializers.user import UserSerializer
 from clubs.serializers import ClubSerializer
 from products.serializers import ProductSerializer
 

@@ -13,3 +13,5 @@ class UserSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['id', 'username', 'email', 'full_name','specialization', 
                   'joined_communities', 'joined_clubs', 'purchased_products']
+        
+
