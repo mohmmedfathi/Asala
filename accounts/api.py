@@ -6,7 +6,9 @@ from accounts.permissions import IsAdminOrOwner
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from accounts.models import CustomUser
-
+from communities.serializers import CommunitySerializer
+from clubs.serializers import ClubSerializer
+from products.serializers import ProductSerializer
 
 class UserViewSet(viewsets.ModelViewSet):
     """
@@ -18,6 +20,23 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return CustomUser.objects.all() if self.request.user.is_staff else CustomUser.objects.filter(id=self.request.user.id)
+
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Override retrieve to return full user info including:
+        - Joined Communities
+        - Joined Clubs
+        - Purchased Products
+        """
+        instance = self.get_object()
+        data = UserSerializer(instance).data  # Get base user data
+
+        # Include related info
+        data['joined_communities'] = CommunitySerializer(instance.joined_communities.all(), many=True).data
+        data['joined_clubs'] = ClubSerializer(instance.joined_clubs.all(), many=True).data
+        data['purchased_products'] = ProductSerializer(instance.purchased_products.all(), many=True).data
+
+        return Response(data)
 
 class RegisterView(APIView):
     """
