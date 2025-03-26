@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from rest_framework.permissions import  IsAuthenticated,AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
-from accounts.serializers.user import UserSerializer, CustomTokenObtainPairSerializer,RegisterSerializer
+from accounts.serializers.user import UserSerializer,RegisterSerializer
 from accounts.permissions import IsAdminOrOwner
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -50,8 +50,7 @@ class RegisterView(APIView):
             user = serializer.save()
             return Response({'message': 'User registered successfully', 'user': UserSerializer(user).data}, status=201)
 
-        # Convert error lists into single strings
-        formatted_errors = {field: errors[0] for field, errors in serializer.errors.items()}
+        formatted_errors = " | ".join([f"{field} {errors[0]}" for field, errors in serializer.errors.items()])
         return Response({'message': formatted_errors}, status=400)
 
 class CustomTokenObtainPairView(TokenObtainPairView):

@@ -1,7 +1,7 @@
 import os
 import psycopg2
 from urllib.parse import urlparse
-import dj_database_url
+
 
 # Get your database URL from Django settings
 DATABASE_URL = 'postgresql://asala_postgres_user:wv209HQOYUTr7MDKClmIcq9N68xrO3sc@dpg-cvfi5t5umphs73daajh0-a.oregon-postgres.render.com/asala_postgres'

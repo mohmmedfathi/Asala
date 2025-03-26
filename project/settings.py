@@ -131,8 +131,8 @@ CORS_ALLOW_CREDENTIALS = True
 
 SIMPLE_JWT = {
     
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=900),  
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),  
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=9000),  
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=70),  
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'ALGORITHM': 'HS256',

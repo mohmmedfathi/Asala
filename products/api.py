@@ -6,13 +6,14 @@ from products.serializers import ProductSerializer
 
 class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated, IsAdminOrOwner]  
+    permission_classes = [IsAuthenticated]  
     
     def get_queryset(self):
         user = self.request.user
         if user.is_staff:  
             return Product.objects.all()  
-        return Product.objects.filter(buyers=user)
+        # return Product.objects.filter(buyers=user)
+        return Product.objects.all()  
 
     # def perform_create(self, serializer):
     #     """Automatically set the authenticated user as the owner of the product."""

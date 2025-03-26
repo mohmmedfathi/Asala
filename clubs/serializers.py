@@ -6,5 +6,5 @@ class ClubSerializer(serializers.ModelSerializer):
     members = UserSerializer(many=True) 
     class Meta:
         model = Club
-        fields = ['id', 'name', 'description', 'image', 'icon', 'members']
+        fields = ['id', 'name', 'description', 'icon', 'members']
 
