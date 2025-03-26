@@ -30,7 +30,21 @@ class RegisterView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             return Response({'message': 'User registered successfully', 'user': UserSerializer(user).data}, status=201)
-        return Response(serializer.errors, status=400)
+
+        # Convert error lists into single strings
+        formatted_errors = {field: errors[0] for field, errors in serializer.errors.items()}
+        return Response({'message': formatted_errors}, status=400)
 
 class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
+    """
+    Custom login view with formatted error messages.
+    """
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+
+        if response.status_code != 200:
+            formatted_errors = {field: errors[0] for field, errors in response.data.items()}
+            return Response({'message': formatted_errors}, status=response.status_code)
+
+        return response
+
