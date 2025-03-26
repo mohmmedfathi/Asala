@@ -61,8 +61,14 @@ class CustomTokenObtainPairView(TokenObtainPairView):
         response = super().post(request, *args, **kwargs)
 
         if response.status_code != 200:
-            formatted_errors = {field: errors[0] for field, errors in response.data.items()}
+            # Format validation errors inside "message" key
+            formatted_errors = " | ".join([f"{field} {errors[0]}" for field, errors in response.data.items()])
             return Response({'message': formatted_errors}, status=response.status_code)
 
+        # Get user from validated credentials
+        user = CustomUser.objects.get(username=request.data.get("username"))
+
+        # Include user info in response
+        response.data["user"] = UserSerializer(user).data  
         return response
 
