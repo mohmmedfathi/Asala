@@ -1,12 +1,14 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from accounts.permissions import IsAdminOrOwner
+from accounts.permissions import IsAdminOrOwner, IsAdminOrProductBuyer
 from products.models import Product
 from products.serializers import ProductSerializer
-
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.decorators import action
 class ProductViewSet(viewsets.ModelViewSet):
     serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated]  
+    permission_classes = [IsAuthenticated, IsAdminOrProductBuyer]  
     
     def get_queryset(self):
         user = self.request.user
@@ -15,16 +17,18 @@ class ProductViewSet(viewsets.ModelViewSet):
         # return Product.objects.filter(buyers=user)
         return Product.objects.all()  
 
-    # def perform_create(self, serializer):
-    #     """Automatically set the authenticated user as the owner of the product."""
-    #     print(serializer)
-    #     print("----------------")
-    #     print(self.reqeust)
-    #     serializer.save(owner=self.request.user)
+    @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
+    def purchase(self, request, pk=None):
+        user = request.user
+        try:
+            product = Product.objects.get(pk=pk)
+        except Product.DoesNotExist:
+            return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
         
-    # def get_queryset(self):
-    #     """Filter products to only show those owned by the authenticated user."""
-    #     user = self.request.user
-    #     if user.is_staff:  
-    #         return Product.objects.all()  
-    #     return Product.objects.filter(owner=user)  
+        # Add product to the user's purchased_products
+        if product not in user.purchased_products.all():
+            user.purchased_products.add(product)
+            user.save()
+            return Response({"detail": f"You have successfully purchased {product.name}!"}, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "You have already purchased this product."}, status=status.HTTP_400_BAD_REQUEST)

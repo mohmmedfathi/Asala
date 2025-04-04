@@ -19,4 +19,9 @@ class IsAdminOrOwner(BasePermission):
         if request.user.is_staff:
             return True
         # Normal users can only access objects they own
-        return obj.owner == request.user
+        return obj == request.user
+
+class IsAdminOrProductBuyer(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        # obj is a Product instance
+        return request.user.is_staff or request.user in obj.buyers.all()

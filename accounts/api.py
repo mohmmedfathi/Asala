@@ -2,14 +2,14 @@ from rest_framework import viewsets
 from rest_framework.permissions import  IsAuthenticated,AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 from accounts.serializers.user import UserSerializer,RegisterSerializer
-from accounts.permissions import IsAdminOrOwner
+from accounts.permissions import IsAdminOrOwner 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from accounts.models import CustomUser
 from communities.serializers import CommunitySerializer
 from clubs.serializers import ClubSerializer
 from products.serializers import ProductSerializer
-
+from rest_framework.decorators import action
 class UserViewSet(viewsets.ModelViewSet):
     """
     - **Admins:** Can list, update, and delete any user.
@@ -20,6 +20,20 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return CustomUser.objects.all() if self.request.user.is_staff else CustomUser.objects.filter(id=self.request.user.id)
+    
+    @action(detail=False, methods=['get', 'patch'], permission_classes=[IsAuthenticated])
+    def me(self, request):
+        user = request.user
+        if request.method == 'PATCH':
+            serializer = self.get_serializer(user, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+        # return full user info with related data
+        data = UserSerializer(user).data
+        data['joined_communities'] = CommunitySerializer(user.joined_communities.all(), many=True).data
+        data['joined_clubs'] = ClubSerializer(user.joined_clubs.all(), many=True).data
+        data['purchased_products'] = ProductSerializer(user.purchased_products.all(), many=True).data
+        return Response(data)
 
     def retrieve(self, request, *args, **kwargs):
         """
