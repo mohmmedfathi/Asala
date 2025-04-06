@@ -10,6 +10,7 @@ from communities.serializers import CommunitySerializer
 from clubs.serializers import ClubSerializer
 from products.serializers import ProductSerializer
 from rest_framework.decorators import action
+
 class UserViewSet(viewsets.ModelViewSet):
     """
     - **Admins:** Can list, update, and delete any user.
@@ -69,20 +70,27 @@ class RegisterView(APIView):
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     """
-    Custom login view with formatted error messages.
+    Custom login view with formatted error messages and extended user info.
     """
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
 
         if response.status_code != 200:
-            # Format validation errors inside "message" key
             formatted_errors = " | ".join([f"{field} {errors[0]}" for field, errors in response.data.items()])
             return Response({'message': formatted_errors}, status=response.status_code)
 
         # Get user from validated credentials
         user = CustomUser.objects.get(username=request.data.get("username"))
 
-        # Include user info in response
-        response.data["user"] = UserSerializer(user).data  
+        # Base user data
+        user_data = UserSerializer(user).data
+        
+        # Add related data
+        user_data['joined_communities'] = CommunitySerializer(user.joined_communities.all(), many=True).data
+        user_data['joined_clubs'] = ClubSerializer(user.joined_clubs.all(), many=True).data
+        user_data['purchased_products'] = ProductSerializer(user.purchased_products.all(), many=True).data
+
+        # Attach to response
+        response.data["user"] = user_data
         return response
 
