@@ -11,9 +11,9 @@ class ProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsAdminOrProductBuyer]  
     
     def get_queryset(self):
-        user = self.request.user
-        if user.is_staff:  
-            return Product.objects.all()  
+        # user = self.request.user  
+
+        
         # return Product.objects.filter(buyers=user)
         return Product.objects.all()  
 
