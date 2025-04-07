@@ -30,7 +30,7 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
         
-        # مرر request داخل context لجميع الـ serializers
+
         context = {'request': request}
 
         data = UserSerializer(user, context=context).data
@@ -73,10 +73,33 @@ class RegisterView(APIView):
         formatted_errors = " | ".join([f"{field} {errors[0]}" for field, errors in serializer.errors.items()])
         return Response({'message': formatted_errors}, status=400)
 
+# class CustomTokenObtainPairView(TokenObtainPairView):
+#     """
+#     Custom login view with formatted error messages and extended user info.
+#     """
+#     def post(self, request, *args, **kwargs):
+#         response = super().post(request, *args, **kwargs)
+
+#         if response.status_code != 200:
+#             formatted_errors = " | ".join([f"{field} {errors[0]}" for field, errors in response.data.items()])
+#             return Response({'message': formatted_errors}, status=response.status_code)
+
+#         # Get user from validated credentials
+#         user = CustomUser.objects.get(username=request.data.get("username"))
+
+#         # Base user data
+#         user_data = UserSerializer(user).data
+        
+       
+#         user_data['joined_communities'] = CommunitySerializer(user.joined_communities.all(), many=True).data
+#         user_data['joined_clubs'] = ClubSerializer(user.joined_clubs.all(), many=True).data
+#         user_data['purchased_products'] = ProductSerializer(user.purchased_products.all(), many=True).data
+
+#         # Attach to response
+#         response.data["user"] = user_data
+#         return response
+
 class CustomTokenObtainPairView(TokenObtainPairView):
-    """
-    Custom login view with formatted error messages and extended user info.
-    """
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
 
@@ -84,18 +107,13 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             formatted_errors = " | ".join([f"{field} {errors[0]}" for field, errors in response.data.items()])
             return Response({'message': formatted_errors}, status=response.status_code)
 
-        # Get user from validated credentials
         user = CustomUser.objects.get(username=request.data.get("username"))
+        context = {'request': request}
 
-        # Base user data
-        user_data = UserSerializer(user).data
-        
-        # Add related data
-        user_data['joined_communities'] = CommunitySerializer(user.joined_communities.all(), many=True).data
-        user_data['joined_clubs'] = ClubSerializer(user.joined_clubs.all(), many=True).data
-        user_data['purchased_products'] = ProductSerializer(user.purchased_products.all(), many=True).data
+        user_data = UserSerializer(user, context=context).data
+        user_data['joined_communities'] = CommunitySerializer(user.joined_communities.all(), many=True, context=context).data
+        user_data['joined_clubs'] = ClubSerializer(user.joined_clubs.all(), many=True, context=context).data
+        user_data['purchased_products'] = ProductSerializer(user.purchased_products.all(), many=True, context=context).data
 
-        # Attach to response
         response.data["user"] = user_data
         return response
-
