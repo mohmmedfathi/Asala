@@ -29,12 +29,17 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = self.get_serializer(user, data=request.data, partial=True)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-        # return full user info with related data
-        data = UserSerializer(user).data
-        data['joined_communities'] = CommunitySerializer(user.joined_communities.all(), many=True).data
-        data['joined_clubs'] = ClubSerializer(user.joined_clubs.all(), many=True).data
-        data['purchased_products'] = ProductSerializer(user.purchased_products.all(), many=True).data
+        
+        # مرر request داخل context لجميع الـ serializers
+        context = {'request': request}
+
+        data = UserSerializer(user, context=context).data
+        data['joined_communities'] = CommunitySerializer(user.joined_communities.all(), many=True, context=context).data
+        data['joined_clubs'] = ClubSerializer(user.joined_clubs.all(), many=True, context=context).data
+        data['purchased_products'] = ProductSerializer(user.purchased_products.all(), many=True, context=context).data
+
         return Response(data)
+
 
     def retrieve(self, request, *args, **kwargs):
         """
