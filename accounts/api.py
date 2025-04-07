@@ -12,10 +12,7 @@ from products.serializers import ProductSerializer
 from rest_framework.decorators import action
 
 class UserViewSet(viewsets.ModelViewSet):
-    """
-    - **Admins:** Can list, update, and delete any user.
-    - **Users:** Can only retrieve and update their own profile.
-    """
+
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated, IsAdminOrOwner]
 
@@ -42,16 +39,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
     def retrieve(self, request, *args, **kwargs):
-        """
-        Override retrieve to return full user info including:
-        - Joined Communities
-        - Joined Clubs
-        - Purchased Products
-        """
-        instance = self.get_object()
-        data = UserSerializer(instance).data  # Get base user data
 
-        # Include related info
+        instance = self.get_object()
+        data = UserSerializer(instance).data 
+
         data['joined_communities'] = CommunitySerializer(instance.joined_communities.all(), many=True).data
         data['joined_clubs'] = ClubSerializer(instance.joined_clubs.all(), many=True).data
         data['purchased_products'] = ProductSerializer(instance.purchased_products.all(), many=True).data
@@ -59,9 +50,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(data)
 
 class RegisterView(APIView):
-    """
-    Public endpoint for user registration.
-    """
+
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -73,31 +62,6 @@ class RegisterView(APIView):
         formatted_errors = " | ".join([f"{field} {errors[0]}" for field, errors in serializer.errors.items()])
         return Response({'message': formatted_errors}, status=400)
 
-# class CustomTokenObtainPairView(TokenObtainPairView):
-#     """
-#     Custom login view with formatted error messages and extended user info.
-#     """
-#     def post(self, request, *args, **kwargs):
-#         response = super().post(request, *args, **kwargs)
-
-#         if response.status_code != 200:
-#             formatted_errors = " | ".join([f"{field} {errors[0]}" for field, errors in response.data.items()])
-#             return Response({'message': formatted_errors}, status=response.status_code)
-
-#         # Get user from validated credentials
-#         user = CustomUser.objects.get(username=request.data.get("username"))
-
-#         # Base user data
-#         user_data = UserSerializer(user).data
-        
-       
-#         user_data['joined_communities'] = CommunitySerializer(user.joined_communities.all(), many=True).data
-#         user_data['joined_clubs'] = ClubSerializer(user.joined_clubs.all(), many=True).data
-#         user_data['purchased_products'] = ProductSerializer(user.purchased_products.all(), many=True).data
-
-#         # Attach to response
-#         response.data["user"] = user_data
-#         return response
 
 class CustomTokenObtainPairView(TokenObtainPairView):
     def post(self, request, *args, **kwargs):

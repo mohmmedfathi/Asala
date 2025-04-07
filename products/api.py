@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from accounts.permissions import IsAdminOrOwner, IsAdminOrProductBuyer
+from accounts.permissions import IsAdminOrProductBuyer
 from products.models import Product
 from products.serializers import ProductSerializer
 from rest_framework.response import Response
@@ -11,10 +11,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated, IsAdminOrProductBuyer]  
     
     def get_queryset(self):
-        # user = self.request.user  
-
-        
-        # return Product.objects.filter(buyers=user)
+      
         return Product.objects.all()  
 
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
@@ -25,7 +22,6 @@ class ProductViewSet(viewsets.ModelViewSet):
         except Product.DoesNotExist:
             return Response({"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND)
         
-        # Add product to the user's purchased_products
         if product not in user.purchased_products.all():
             user.purchased_products.add(product)
             user.save()

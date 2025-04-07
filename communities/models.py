@@ -8,7 +8,6 @@ class Community(TimeStampedModel):
     name = models.CharField(max_length=255)
     description = models.TextField()
     image = models.ImageField(upload_to='communities/', default='default.jpeg')
-    # created_at = models.DateTimeField(auto_now_add=True)
 
 
     def __str__(self):
